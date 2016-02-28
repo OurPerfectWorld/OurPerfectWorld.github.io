@@ -1,22 +1,107 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely need to edit after that.
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
-
 # Site settings
-title: Welcome OurPerfectWorld, Enjoy It!
+title: Our Perfect World
+SEOTitle: 王琳的博客 | Minato Blog
+header-img: img/home-bg.jpg
 email: 276293337@qq.com
-description: > # this means to ignore newlines until "baseurl:"
-  Learning By Doing.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://yourdomain.com" # the base hostname & protocol for your site
-twitter_username: NULL
-github_username:  OurPerfectWorld
+description: "关于游戏与应用前端开发 | 王琳，Game & App Designer | 这里是 @Minato王琳 的个人博客，与你一起学习进步。"
+keyword: "王琳, Minato, 个人网站, 互联网, 手游, 客户端, 设计, 产品"
+url: "http://www.perfectworld.space/welcome.php"              # your host, for absolute URL
+baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
+
+
+
+# SNS settings
+RSS: false
+weibo_username:     "15820715665"
+zhihu_username:     276293337@qq.com
+github_username:    OurPerfectWorld
+# twitter_username:  huxpro
+facebook_username:  false
+
+
 
 # Build settings
-# markdown: kramdown
-markdown: redcarpet     #设置md的渲染引擎
+# from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
 highlighter: rouge
-auto: true
+permalink: pretty
+paginate: 10
+exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
+anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
+
+
+
+# Gems
+# from PR#40, to support local preview for Jekyll 3.0
+gems: [jekyll-paginate]
+
+
+
+# Markdown settings
+# replace redcarpet to kramdown,
+# although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
+# document: http://jekyllrb.com/docs/configuration/#kramdown
+markdown: kramdown
+kramdown:
+  input: GFM                            # use Github Flavored Markdown !important
+
+
+# 评论功能
+# Disqus settings
+#disqus_username: _your_disqus_short_name_
+
+# Duoshuo settings
+# duoshuo_username: huxblog
+# Share component is depend on Comment so we can NOT use share only.
+# duoshuo_share: true                     # set to false if you want to use Comment without Sharing
+
+
+
+# 统计（屏蔽
+# Analytics settings
+# Baidu Analytics
+# ba_track_id: 4cc1f2d8f3067386cc5cdb626a202900
+# Google Analytics
+# ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
+# ga_domain: huangxuan.me
+
+
+# 侧边栏
+# Sidebar settings
+sidebar: true                           # whether or not using Sidebar.
+sidebar-about-description: "越努力，越幸运。Learning By Doing."
+sidebar-avatar: /img/avatar-minato.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+
+
+# 特色标签
+# Featured Tags
+featured-tags: true                     # whether or not using Feature-Tags
+featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
+
+
+
+# Friends
+friends: [
+    # {
+    #     title: "天镶的博客",
+    #     href: "http://lingyu.wang/"
+    # }
+    # ,{
+    #     title: "Luke的自留地",
+    #     href: "http://hmqk1995.github.io"
+    # },{
+    #     title: "Ebn's Blog",
+    #     href: "http://ebnbin.com/"
+    # },{
+    #     title: "SmdCn's Blog",
+    #     href: "http://blog.smdcn.net"
+    # },{
+    #     title: "解旻的博客",
+    #     href: "http://xieminis.me/"
+    # },{
+    #     title: "DHong Say",
+    #     href: "http://dhong.co"
+    # },{
+    #     title: "尹峰以为",
+    #     href: "http://ingf.github.io/"
+    # }
+]

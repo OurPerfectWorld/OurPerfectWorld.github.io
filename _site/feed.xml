@@ -1,222 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Welcome OurPerfectWorld, Enjoy It!</title>
-    <description>Learning By Doing.
-</description>
-    <link>http://yourdomain.com/</link>
-    <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 28 Feb 2016 19:49:57 +0800</pubDate>
-    <lastBuildDate>Sun, 28 Feb 2016 19:49:57 +0800</lastBuildDate>
+    <title>Our Perfect World</title>
+    <description>关于游戏与应用前端开发 | 王琳，Game &amp; App Designer | 这里是 @Minato王琳 的个人博客，与你一起学习进步。</description>
+    <link>http://www.perfectworld.space/welcome.php/</link>
+    <atom:link href="http://www.perfectworld.space/welcome.php/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Sun, 28 Feb 2016 22:49:38 +0800</pubDate>
+    <lastBuildDate>Sun, 28 Feb 2016 22:49:38 +0800</lastBuildDate>
     <generator>Jekyll v3.1.2</generator>
     
       <item>
-        <title>Welcome to Jekyll!</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
-
-&lt;p&gt;To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Tom&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &#39;Hi, Tom&#39; to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
-</description>
-        <pubDate>Sun, 28 Feb 2016 16:06:09 +0800</pubDate>
-        <link>http://yourdomain.com/jekyll/update/2016/02/28/welcome-to-jekyll.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/jekyll/update/2016/02/28/welcome-to-jekyll.html</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
-        
-      </item>
-    
-      <item>
-        <title>绘制属性与Shader编程</title>
-        <description>&lt;h1&gt;绘制属性与Shader编程&lt;/h1&gt;
-
-&lt;hr&gt;
-
+        <title>绘制 &amp; Shader</title>
+        <description>&lt;h1 id=&quot;shader&quot;&gt;绘制属性与Shader编程&lt;/h1&gt;
+&lt;hr /&gt;
 &lt;!-- create time: 2015-01-25 14:48:13  --&gt;
+&lt;p&gt;###Sprite的属性
+1. 绘制属性表现为一个结构体：V3F_C4B_T2F_Quad；
+2. 通过这个结构体表示矩形图元的4个顶点属性（坐标，颜色，纹理坐标）；
+3. 多边形的图元都被分成三角形图元；&lt;/p&gt;
 
-&lt;h3&gt;Sprite的属性&lt;/h3&gt;
+&lt;p&gt;###Sprite的颜色混合
+1. 颜色混合定义：  &lt;br /&gt;
+    当前Sprite与颜色缓存区中相同位置颜色值的混合方式，通过Alpha通道计算一个图层与环境图片的组合方式；
+2. 发生的时间：  &lt;br /&gt;
+    OpenGL ES绘图管线最后阶段——片元处理；
+3. 源颜色：  &lt;br /&gt;
+    片段操作中，光棚化产生的片段颜色值成为源；
+4. 目标颜色：  &lt;br /&gt;
+    缓冲区上对应该位置的颜色值成为目标；
+5. 混合计算：  &lt;br /&gt;
+    混合的结果取决于混合计算方式和混合模式，可以通过&lt;strong&gt;BlendEquation&lt;/strong&gt;和&lt;strong&gt;BlendEquationSeparate&lt;/strong&gt;来设置计算方程，通过&lt;strong&gt;BlendFuncSeparate&lt;/strong&gt;和&lt;strong&gt;BlendFunc&lt;/strong&gt;来设置源和目标的权重系数；
+6. 猜想：  &lt;br /&gt;
+    Cocos2d的混合模式和Flash有偏差，是否是设置计算方程的问题？&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;绘制属性表现为一个结构体：V3F&lt;em&gt;C4B&lt;/em&gt;T2F_Quad；&lt;/li&gt;
-&lt;li&gt;通过这个结构体表示矩形图元的4个顶点属性（坐标，颜色，纹理坐标）；&lt;/li&gt;
-&lt;li&gt;多边形的图元都被分成三角形图元；&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;###Sprite的颜色叠加
+1. 颜色叠加定义：  &lt;br /&gt;
+    将一个颜色值作用在一个图层或精灵的每个颜色通道中；
+2. realColor()与realOpacity()表示Node节点元素本身的颜色属性；
+3. diplayedColor()与displayedOpacity()表示节点与父元素叠加过后最终绘制颜色；
+4. 叠加公式：  &lt;br /&gt;
+    displayColor = realColor * parentColor / 255.0;
+5. 与片段着色器的关系：
+    + 原理：将Sprite叠加后的displayColor存入顶点数组_quad，Sprite默认使用&lt;strong&gt;Shader_Name_Position_Texture_Color_No_MVP&lt;/strong&gt;着色器组，其中的a_postion（顶点坐标），a_texCoord（纹理），a_color（＝v_fragmentColor）（颜色），通过片段着色器绘制最终叠加后的纹理；
+    + 变量对应：（待验证）
+        1. shader中CC_Texture0对应Sprite的realColor；
+        2. v_fragmentColor对应Sprite的displayColor，为源颜色；
+        3. Texture2D（CC_Texture0，v_texCoord）和v_fragmentColor运算后的色值是目标颜色，在缓冲区中
+6. 问题：_quad的三个属性是否对应a_XXX的三个值？
+    + V3F_C4B_T2F三个属性分别对应a_position,a_color,a_texCoord，对的
+    + 当Sprite含Alpha通道时，a_color对应的是用displayColor通过透明度预乘后的color4变量，否则是displayColor的值；&lt;/p&gt;
 
-&lt;h3&gt;Sprite的颜色混合&lt;/h3&gt;
+&lt;h2 id=&quot;opengl-es-&quot;&gt;##OpenGL ES 着色器语言&lt;/h2&gt;
+&lt;p&gt;###变量类型
+1. vec2：2个分量的浮点型向量
+2. bvec2：2个分量的布尔类型向量
+3. mat2：2*2的浮点型矩阵
+4. sampler2D：2D纹理句柄，采样器，自动被初始化
+5. samplerCube：立方体纹理句柄
+6. 不支持字符串操作，不支持double精度的类型，不支持指针，变量都是值类型&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;颜色混合定义：&lt;br&gt;
-当前Sprite与颜色缓存区中相同位置颜色值的混合方式，通过Alpha通道计算一个图层与环境图片的组合方式；&lt;/li&gt;
-&lt;li&gt;发生的时间：&lt;br&gt;
-OpenGL ES绘图管线最后阶段——片元处理；&lt;/li&gt;
-&lt;li&gt;源颜色：&lt;br&gt;
-片段操作中，光棚化产生的片段颜色值成为源；&lt;/li&gt;
-&lt;li&gt;目标颜色：&lt;br&gt;
-缓冲区上对应该位置的颜色值成为目标；&lt;/li&gt;
-&lt;li&gt;混合计算：&lt;br&gt;
-混合的结果取决于混合计算方式和混合模式，可以通过&lt;strong&gt;BlendEquation&lt;/strong&gt;和&lt;strong&gt;BlendEquationSeparate&lt;/strong&gt;来设置计算方程，通过&lt;strong&gt;BlendFuncSeparate&lt;/strong&gt;和&lt;strong&gt;BlendFunc&lt;/strong&gt;来设置源和目标的权重系数；&lt;/li&gt;
-&lt;li&gt;猜想：&lt;br&gt;
-Cocos2d的混合模式和Flash有偏差，是否是设置计算方程的问题？&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;###储存限定符
+1. const：常量，只读；
+2. attribute：应用程序传输给顶点着色器的每个顶点数据；
+3. uniform：应用程序传输给顶点、片段着色器的全局变量；
+4. varying：顶点着色器传输给片段着色器的，经过插值的易变变量；&lt;/p&gt;
 
-&lt;h3&gt;Sprite的颜色叠加&lt;/h3&gt;
+&lt;p&gt;###矢量的分量
+1. ｛x，y，z，w｝：表示顶点坐标或法向量
+2. ｛r，g，b，a｝：表示颜色 
+3. ｛s，t，p，q｝：表示纹理坐标&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;颜色叠加定义：&lt;br&gt;
-将一个颜色值作用在一个图层或精灵的每个颜色通道中；&lt;/li&gt;
-&lt;li&gt;realColor()与realOpacity()表示Node节点元素本身的颜色属性；&lt;/li&gt;
-&lt;li&gt;diplayedColor()与displayedOpacity()表示节点与父元素叠加过后最终绘制颜色；&lt;/li&gt;
-&lt;li&gt;叠加公式：&lt;br&gt;
-displayColor = realColor * parentColor / 255.0;&lt;/li&gt;
-&lt;li&gt;与片段着色器的关系：
+&lt;p&gt;###Sprite的顶点属性绑定
+1. Sprite的顶点属性结构是V3F_C4B_T2F，在程序中成为通用属性，用一个索引值表示，取值范围是【0，MAX_VERTEX_ATTRIBS】，该索引值对应于GPU存储区的一个位置；
+2. 通过一个属性变量名称绑定到一个通用属性索引值来建立通用属性索引值与顶点着色器中属性变量名称的映射关系；&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;原理：将Sprite叠加后的displayColor存入顶点数组&lt;em&gt;quad，Sprite默认使用**Shader&lt;/em&gt;Name&lt;em&gt;Position&lt;/em&gt;Texture&lt;em&gt;Color&lt;/em&gt;No&lt;em&gt;MVP**着色器组，其中的a&lt;/em&gt;postion（顶点坐标），a&lt;em&gt;texCoord（纹理），a&lt;/em&gt;color（＝v_fragmentColor）（颜色），通过片段着色器绘制最终叠加后的纹理；&lt;/li&gt;
-&lt;li&gt;变量对应：（待验证）
+&lt;p&gt;###顶点着色器
+1. 输入
+    + Attribute（程序传入）
+    + Uniforms（全局变量）
+    + Samplers（纹理采样器，可选）
+2. 输出  &lt;br /&gt;
+    + Varying（输出）
+    + gl_Position，gl_FrontFacing，gl_PointSize
+3. 内置的全局属性变量uniform
+    + CC_PMatrix——当前摄影机的投影矩阵
+    + CC_MVMatrix——模型视图变换矩阵
+    + CC_MVPMatrix——将顶点坐标转换位裁剪坐标系CC_PMatrix&lt;em&gt;CC_MVMatrix
+    + CC_Time——游戏自运行记时的时间变量
+    + CC_SinTime，CC_CosTime——时间的运算
+    + CC_Random01——获取随机值
+    + CC_Texture&lt;/em&gt; ——获取纹理采样器
+    + 通过setUniformsForBuiltins（）设置这些全局变量
+    + 通关setProjection设置CC_PMatrix
+4. 主要工作
+    + 设置顶点坐标，输出内置变量gl_Position＝CC_MVPMatrix*a_position
+    + 根据图元的顶点分布计算一些易变量值varying供片段着色器使用v_fragmentColor（融合颜色——Sprite.displayColor）和v_texCoord（纹理坐标）&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;shader中CC_Texture0对应Sprite的realColor；&lt;/li&gt;
-&lt;li&gt;v_fragmentColor对应Sprite的displayColor，为源颜色；&lt;/li&gt;
-&lt;li&gt;Texture2D（CC&lt;em&gt;Texture0，v&lt;/em&gt;texCoord）和v_fragmentColor运算后的色值是目标颜色，在缓冲区中&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;问题：&lt;em&gt;quad的三个属性是否对应a&lt;/em&gt;XXX的三个值？
+&lt;p&gt;###片段着色器
+1. 输入
+    + Varying（顶点着色器输出的经过光棚化插值）
+    + Uniforms（全局变量）
+    + Samplers（纹理采样器，可选）
+    + gl_FrontFacing，gl_PointCoord，gl_FragCoord内置变量
+2. 输出
+    + gl_FragColor——片段颜色值
+3. texture2D（CC_Texture0，v_texCoord）
+    + 纹理查找方法，查找纹理上某个纹理坐标的颜色值
+    + 对应为源颜色
+    + v_fragmentColor（displayColor）——目标颜色
+4. 问题：a_color中对应是Sprite的顶点属性颜色值，取值范围？
+    + 【0，1】or【0，255】&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;V3F&lt;em&gt;C4B&lt;/em&gt;T2F三个属性分别对应a&lt;em&gt;position,a&lt;/em&gt;color,a_texCoord，对的&lt;/li&gt;
-&lt;li&gt;当Sprite含Alpha通道时，a_color对应的是用displayColor通过透明度预乘后的color4变量，否则是displayColor的值；&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;###总结
+1. 混合模式和Shader是有关系的，混合模式发生在片段着色器的处理中
+2. 修改Shader_Name_Position_Texture_Color_No_MVP会导致没有叠加效果&lt;/p&gt;
 
-&lt;h2&gt;OpenGL ES 着色器语言&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;h3&gt;变量类型&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;vec2：2个分量的浮点型向量&lt;/li&gt;
-&lt;li&gt;bvec2：2个分量的布尔类型向量&lt;/li&gt;
-&lt;li&gt;mat2：2*2的浮点型矩阵&lt;/li&gt;
-&lt;li&gt;sampler2D：2D纹理句柄，采样器，自动被初始化&lt;/li&gt;
-&lt;li&gt;samplerCube：立方体纹理句柄&lt;/li&gt;
-&lt;li&gt;不支持字符串操作，不支持double精度的类型，不支持指针，变量都是值类型&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;储存限定符&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;const：常量，只读；&lt;/li&gt;
-&lt;li&gt;attribute：应用程序传输给顶点着色器的每个顶点数据；&lt;/li&gt;
-&lt;li&gt;uniform：应用程序传输给顶点、片段着色器的全局变量；&lt;/li&gt;
-&lt;li&gt;varying：顶点着色器传输给片段着色器的，经过插值的易变变量；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;矢量的分量&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;｛x，y，z，w｝：表示顶点坐标或法向量&lt;/li&gt;
-&lt;li&gt;｛r，g，b，a｝：表示颜色 &lt;/li&gt;
-&lt;li&gt;｛s，t，p，q｝：表示纹理坐标&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;Sprite的顶点属性绑定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Sprite的顶点属性结构是V3F&lt;em&gt;C4B&lt;/em&gt;T2F，在程序中成为通用属性，用一个索引值表示，取值范围是【0，MAX&lt;em&gt;VERTEX&lt;/em&gt;ATTRIBS】，该索引值对应于GPU存储区的一个位置；&lt;/li&gt;
-&lt;li&gt;通过一个属性变量名称绑定到一个通用属性索引值来建立通用属性索引值与顶点着色器中属性变量名称的映射关系；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;顶点着色器&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;输入
-
-&lt;ul&gt;
-&lt;li&gt;Attribute（程序传入）&lt;/li&gt;
-&lt;li&gt;Uniforms（全局变量）&lt;/li&gt;
-&lt;li&gt;Samplers（纹理采样器，可选）&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;输出&lt;br&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Varying（输出）&lt;/li&gt;
-&lt;li&gt;gl&lt;em&gt;Position，gl&lt;/em&gt;FrontFacing，gl_PointSize&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;内置的全局属性变量uniform
-
-&lt;ul&gt;
-&lt;li&gt;CC_PMatrix——当前摄影机的投影矩阵&lt;/li&gt;
-&lt;li&gt;CC_MVMatrix——模型视图变换矩阵&lt;/li&gt;
-&lt;li&gt;CC&lt;em&gt;MVPMatrix——将顶点坐标转换位裁剪坐标系CC&lt;/em&gt;PMatrix*CC_MVMatrix&lt;/li&gt;
-&lt;li&gt;CC_Time——游戏自运行记时的时间变量&lt;/li&gt;
-&lt;li&gt;CC&lt;em&gt;SinTime，CC&lt;/em&gt;CosTime——时间的运算&lt;/li&gt;
-&lt;li&gt;CC_Random01——获取随机值&lt;/li&gt;
-&lt;li&gt;CC_Texture* ——获取纹理采样器&lt;/li&gt;
-&lt;li&gt;通过setUniformsForBuiltins（）设置这些全局变量&lt;/li&gt;
-&lt;li&gt;通关setProjection设置CC_PMatrix&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;主要工作
-
-&lt;ul&gt;
-&lt;li&gt;设置顶点坐标，输出内置变量gl&lt;em&gt;Position＝CC&lt;/em&gt;MVPMatrix*a_position&lt;/li&gt;
-&lt;li&gt;根据图元的顶点分布计算一些易变量值varying供片段着色器使用v&lt;em&gt;fragmentColor（融合颜色——Sprite.displayColor）和v&lt;/em&gt;texCoord（纹理坐标）&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;片段着色器&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;输入
-
-&lt;ul&gt;
-&lt;li&gt;Varying（顶点着色器输出的经过光棚化插值）&lt;/li&gt;
-&lt;li&gt;Uniforms（全局变量）&lt;/li&gt;
-&lt;li&gt;Samplers（纹理采样器，可选）&lt;/li&gt;
-&lt;li&gt;gl&lt;em&gt;FrontFacing，gl&lt;/em&gt;PointCoord，gl_FragCoord内置变量&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;输出
-
-&lt;ul&gt;
-&lt;li&gt;gl_FragColor——片段颜色值&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;texture2D（CC&lt;em&gt;Texture0，v&lt;/em&gt;texCoord）
-
-&lt;ul&gt;
-&lt;li&gt;纹理查找方法，查找纹理上某个纹理坐标的颜色值&lt;/li&gt;
-&lt;li&gt;对应为源颜色&lt;/li&gt;
-&lt;li&gt;v_fragmentColor（displayColor）——目标颜色&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;问题：a_color中对应是Sprite的顶点属性颜色值，取值范围？
-
-&lt;ul&gt;
-&lt;li&gt;【0，1】or【0，255】&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3&gt;总结&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;混合模式和Shader是有关系的，混合模式发生在片段着色器的处理中&lt;/li&gt;
-&lt;li&gt;修改Shader&lt;em&gt;Name&lt;/em&gt;Position&lt;em&gt;Texture&lt;/em&gt;Color&lt;em&gt;No&lt;/em&gt;MVP会导致没有叠加效果&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;25 Jan 2015&lt;/p&gt;
 </description>
-        <pubDate>Sun, 25 Jan 2015 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B.html</guid>
+        <pubDate>Sun, 25 Jan 2015 20:00:00 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B/</guid>
+        
+        <category>生活</category>
         
         
       </item>
