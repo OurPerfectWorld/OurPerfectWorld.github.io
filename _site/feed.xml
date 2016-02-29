@@ -5,9 +5,1084 @@
     <description>关于游戏与应用前端开发 | 王琳，Game &amp; App Designer | 这里是 @Minato王琳 的个人博客，与你一起学习进步。</description>
     <link>http://www.perfectworld.space/welcome.php/</link>
     <atom:link href="http://www.perfectworld.space/welcome.php/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 28 Feb 2016 22:53:16 +0800</pubDate>
-    <lastBuildDate>Sun, 28 Feb 2016 22:53:16 +0800</lastBuildDate>
+    <pubDate>Mon, 29 Feb 2016 14:27:12 +0800</pubDate>
+    <lastBuildDate>Mon, 29 Feb 2016 14:27:12 +0800</lastBuildDate>
     <generator>Jekyll v3.1.2</generator>
+    
+      <item>
+        <title>APNS &amp; IOS</title>
+        <description>&lt;h1 id=&quot;apns&quot;&gt;APNS接入的流程总结&lt;/h1&gt;
+
+&lt;!-- *************************
+# -*- coding:utf-8 -*-
+# author: WangLin &lt;276293337@qq.com&gt;
+# filename: APNS接入的流程总结.md
+# description: TODO
+# create date: 2016-01-28 09:16:12
+************************** --&gt;
+
+&lt;h3 id=&quot;apns-1&quot;&gt;APNS接入步骤&lt;/h3&gt;
+&lt;p&gt;#### 前期的三个文件准备
+* CSR 从keyChain导出的请求证书
+* aps_development.cer 通过上传CSR导出的文件
+* ck.p12 安装aps_development.cer后，出现Apple Development IOS Push Services，从中导出的密钥文件&lt;/p&gt;
+
+&lt;h4 id=&quot;section&quot;&gt;执行步骤&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;方法一
+    &lt;ul&gt;
+      &lt;li&gt;
+        &lt;p&gt;openssl pkcs12 -in ck.p12 -out ck.pem -nodes&lt;/p&gt;
+
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     生成过程中输入导出ck.p12文件的秘密并设置新密码
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;使用PHP进行连接&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;http://blog.csdn.net/jiajiayouba/article/details/39926017&quot;&gt;参考连接&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;方法二
+    &lt;ul&gt;
+      &lt;li&gt;openssl x509 -in aps_development.cer -inform der -out PushChatCert.pem&lt;/li&gt;
+      &lt;li&gt;openssl pkcs12 -nocerts -out PushChatKey.pem -in ck.p12&lt;/li&gt;
+      &lt;li&gt;cat PushChatCert.pem PushChatKey.pem &amp;gt; ck.pem&lt;/li&gt;
+      &lt;li&gt;使用PHP进行连接&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;http://blog.csdn.net/showhilllee/article/details/8631734&quot;&gt;参考连接&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;php&quot;&gt;PHP测试&lt;/h4&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &amp;lt;?php
+
+    // Put your device token here (without spaces):
+    $deviceToken = &#39;bbce95a527f80027f0bbe898b9c037712a5391b816b218e98dd2fb97ceb91717&#39;;
+    
+    // Put your private key&#39;s passphrase here:密语
+    $filename = &#39;ck.pem&#39;;
+    $passphrase = &#39;123456&#39;;
+    
+    // Put your alert message here:
+    $message = &#39;推送好消息&#39;;
+            
+    $ctx = stream_context_create();
+    stream_context_set_option($ctx, &#39;ssl&#39;, &#39;local_cert&#39;, $filename);
+    stream_context_set_option($ctx, &#39;ssl&#39;, &#39;passphrase&#39;, $passphrase);
+    
+    // Open a connection to the APNS server
+    $fp = stream_socket_client(
+    //	&#39;tls://gateway.push.apple.com:2195&#39;, $err,
+    	&#39;ssl://gateway.sandbox.push.apple.com:2195&#39;, $err,
+    	$errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
+    
+    if (!$fp)
+    	exit(&quot;Failed to connect: $err $errstr&quot; . PHP_EOL);
+    
+    echo &#39;Connected to APNS&#39; . PHP_EOL;
+    
+    // Create the payload body
+    $body[&#39;aps&#39;] = array(
+    	&#39;alert&#39; =&amp;gt; $message,
+    	&#39;sound&#39; =&amp;gt; &#39;default&#39;
+    	);
+    
+    // Encode the payload as JSON
+    $payload = json_encode($body);
+    
+    // Build the binary notification
+    $msg = chr(0) . pack(&#39;n&#39;, 32) . pack(&#39;H*&#39;, $deviceToken) . pack(&#39;n&#39;, strlen($payload)) . $payload;
+    
+    // Send it to the server
+    $result = fwrite($fp, $msg, strlen($msg));
+    
+    if (!$result)
+    	echo &#39;Message not delivered&#39; . PHP_EOL;
+    else
+    	echo &#39;Message successfully delivered&#39; . PHP_EOL;
+    
+    // Close the connection to the server
+    fclose($fp);
+        
+    ?&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;正式版本&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;修改客户端的证书&lt;/li&gt;
+  &lt;li&gt;使用aps.cer生成新的.pem文件传送给APNS&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;其他参考&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://blog.csdn.net/phunxm/article/details/42685597&quot;&gt;iOS Provisioning Profile(Certificate)与Code Signing详解&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Copyright 2016 WangLin&lt;/p&gt;
+</description>
+        <pubDate>Thu, 28 Jan 2016 17:16:12 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2016/01/28/APNS%E6%8E%A5%E5%85%A5%E7%9A%84%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2016/01/28/APNS%E6%8E%A5%E5%85%A5%E7%9A%84%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/</guid>
+        
+        <category>APNS</category>
+        
+        <category>IOS</category>
+        
+        <category>推送</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>推送技术选择</title>
+        <description>&lt;h1 id=&quot;remote&quot;&gt;Remote的技术选型&lt;/h1&gt;
+&lt;!-- *************************
+# -*- coding:utf-8 -*-
+# author: WangLin &lt;276293337@qq.com&gt;
+# filename: Remote的技术选型.md
+# description: TODO
+# create date: 2016-01-28 08:59:45
+************************** --&gt;
+
+&lt;h3 id=&quot;remote-1&quot;&gt;Remote&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;定义&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  服务器信息的远程推送，推送到指定的客户端，不管客户端是开启状态 or 后台状态 or 关闭状态，都可以实时提醒
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;推送技术的评估&lt;/h3&gt;
+&lt;p&gt;##### Android平台
+* Google官方提高的&lt;strong&gt;GCM&lt;/strong&gt;
+    * 存在问题
+        1. Android很多被手机厂商定制化，厂商可能会去掉GCM服务。
+        + Android 2.2到3.0之间需要安装Google Store并设置Google帐号。
+        + 由于国内2G和移动3G的NAT超时时间都小于GCM心跳时间(28分钟)，TCP长连接必然无法保活，每次都要等28分钟心跳失败重连后才能收到Push。
+        + 某些运营商可能限制了5228端口，移动3G/2G下，发现几乎无法连接上GCM服务器，也就无法获得GCM通知，WhatsApp放后台10分钟后，经常很长时间都收不到Push消息。
+* 第三方技术
+    * 根据项目采用的语言类型进行考虑，推荐使用腾讯的信鸽
+    * 参考连接：&lt;a href=&quot;https://www.zhihu.com/question/22354498&quot;&gt;Android推送SDK哪家好&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;ios&quot;&gt;IOS平台&lt;/h5&gt;
+&lt;ul&gt;
+  &lt;li&gt;Apple官方提高的&lt;strong&gt;APNS&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;越狱的IOS平台，可以采用第三方平台，具体选型参考Android的技术选型&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id=&quot;wp&quot;&gt;WP平台&lt;/h5&gt;
+&lt;ul&gt;
+  &lt;li&gt;Windows官方提供的&lt;strong&gt;MPNS&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;其他平台暂无了解&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;总结&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;AppStore平台，采用APNS&lt;/li&gt;
+  &lt;li&gt;IOS和Android平台，采用第三平台采用腾讯的信鸽&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Copyright 2016 WangLin&lt;/p&gt;
+</description>
+        <pubDate>Thu, 28 Jan 2016 16:59:45 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2016/01/28/Remote%E7%9A%84%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2016/01/28/Remote%E7%9A%84%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B/</guid>
+        
+        <category>推送</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>TCP &amp; IP</title>
+        <description>&lt;h1 id=&quot;tcpip&quot;&gt;TCP/IP&lt;/h1&gt;
+
+&lt;p&gt;##第一章
+###服务端套接字
+####1. 构建过程
+1. 调用socket创建套接字（安装电话）
+2. 调用bind分配IP和端口号（分配电话号码）
+3. 调用listen将套接字转为可以连接状态（连接电话线）
+4. 调用accept受理连接请求，有连接请求时会有返回（拿起电话筒）
+5. 调用write来传输数据&lt;/p&gt;
+
+&lt;p&gt;###客户端套接字
+####1. 构建过程
+1. 调用socket创建套接字
+2. 调用connect向服务端发送请求&lt;/p&gt;
+
+&lt;p&gt;###文件操作
+####1. 文件描述符定义
+文件描述符是系统分配给文件或者套接字的整数&lt;/p&gt;
+
+&lt;p&gt;####2.在Windows和Linux下的区别
+1. Windows系统中称这个整数为句柄
+2. Linux系统中称位文件描述符&lt;/p&gt;
+
+&lt;p&gt;####3.用途
+方便程序和操作系统间的沟通而赋予的整数&lt;/p&gt;
+
+&lt;p&gt;####4.关于文件操作
+1. Linux操作系统上不区分文件与套接字，在操作文件和套接字上使用相同的函数
+2. 以_t后缀的数据类型，为操作系统定义的元数据类型&lt;/p&gt;
+
+&lt;p&gt;####5.Linux上文件和套接字操作的对比，无区分&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    int fd1 = socket(PF_INET, SOCK_STREAM, 0);
+    int fd2 = open(&quot;test.dat&quot;, O_CREAT|O_WRONLY|O_TRUNC);
+    close(fd1);
+    close(fd2);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;####6.Windows上严格区分文件I/O函数和套接字I/O函数
+1. 文件I/O使用read和write函数
+2. 套接字I/O使用send和recv函数&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;##第二章
+###套接字协议
+####1. 定义
+约定的通信规则
+####2. 协议如何运用在socket上&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    int socket(int domain, int type, int protocol)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;#####1. domain 协议族的信息
+1. PF_INET IPv4协议
+2. PE_INET6 IPv6协议
+#####2. type 套接字类型
+1. 描述：决定套接字的数据传输方式，如PE_INET存在多种传输方式
+2. 面向连接的套接字SOCK_STREAM——可靠，按序，基于字节的面向连接传输方式的套接字
+3. 面向消息的套接字SOCK_DGRAM——不可靠，不按序，以数据的高速传输为目的的套接字
+#####3. protocol 最终采用的协议
+1. 一般情况下传递0，表示前面两个参数已经可以创建唯一的套接字
+2. 同一个协议族中存在多个数据传输方式系统的协议时，则需要第三个参数来指定协议信息
+3. IPv4协议族中，面向连接的套接字只有IPPROTO_TCP
+4. IPv4协议族中，面向消息的套接字只有IPPROTO_UDP&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;##第三章
+###IP地址和端口号
+1. IP地址是为了收发网络数据而分配给计算机的值
+2. 端口号是同一个操作系统内区分不同套接字而设置的值
+3. TCP套接字和UDP套接字不会共用端口号，运行重复&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;##第四章
+####TCP/IP
+#####1. 协议栈
+1. 链路层
+    + 物理链接
+2. IP层
+    + 解决数据传输中路径选择问题
+    + 面向消息，不可靠的协议
+3. 传输层
+    + 决定主机间数据传输方式，TCP协议确认后向不可靠的IP协议赋予可靠性
+4. 应用层
+    + 编写应用中，根据程序特点决定服务端和客户端的数据传输规则&lt;/p&gt;
+
+&lt;h4 id=&quot;tcp&quot;&gt;基于TCP的服务端&lt;/h4&gt;
+&lt;p&gt;#####1. 进入等待连接请求状态
+1. 调用listen函数，socket可接收客户端连接请求的状态称为等待连接请求状态
+2. 调用listen后，客户端才能进入可发送请求的状态&lt;/p&gt;
+
+&lt;p&gt;#####2. 受理客户端连接请求
+1. 调用accept函数手里连接请求等待队列中待处理的客户端连接请求
+2. 请求成功时，内部产生用于数据I/O的套接字，并返回其文件描述符，该套接字是自动与发起请求的客户端建立连接&lt;/p&gt;
+
+&lt;h4 id=&quot;tcp-1&quot;&gt;基于TCP的服务端&lt;/h4&gt;
+&lt;p&gt;#####1. 调用connect进行发送连接请求，发生以下情况时才会返回
+1. 服务器端接受连接请求
+2. 发生断网异常时，中断连接请求&lt;/p&gt;
+
+&lt;p&gt;#####2. 客户端的IP地址和端口分配
+1. 客户端调用connect时，自动分配，无需进行bind函数分配&lt;/p&gt;
+
+&lt;p&gt;####TCP原理
+#####1. TCP套接字中I/O缓冲
+1. TCP数据收发无边界，即字节数的读写，可以分多次函数调用进行
+2. write调用后，并非立即传输数据，调用瞬间，数据将移至输出缓冲，适当时传向对方的输入缓冲&lt;/p&gt;
+
+&lt;p&gt;#####2. 缓冲特性
+1. I/O缓冲在每个TCP套接字中单独存在
+2. I/O缓冲在创建套接字时自动生成
+3. 关闭套接字，也会继续传递输出缓冲中遗留的数据
+4. 关闭套接字，将丢失输入缓冲中的数据&lt;/p&gt;
+
+&lt;p&gt;#####3. 滑动窗口协议
+1. 不会发生超过输入缓冲大小的数据传输
+2. 不会因为缓冲溢出而丢失数据&lt;/p&gt;
+
+&lt;p&gt;#####4. 三次握手
+1. 与对方套接字建立连接
+2. 与对方套接字进行数据交换
+3. 断开与对方套接字的连接&lt;/p&gt;
+
+&lt;p&gt;##第六章
+###UDP
+####1. 与TCP的区别
+1. 流控制是区分TCP和UDP的重要标志&lt;/p&gt;
+
+&lt;p&gt;####2. 原理
+1. 根据端口号，将主机的数据包交付给最终UDP套接字&lt;/p&gt;
+
+&lt;p&gt;####3. TCP比UDP慢的主要原因
+1. 收发数据前后进行连接设置及清除过程
+2. 收发数据过程中为保证可靠性而添加的流控制&lt;/p&gt;
+
+&lt;p&gt;####4. 基于UDP的客户端和服务端实现
+1. 只需要创建套接字过程和数据交换过程
+2. UDP不会保持连接状态，每次传输数据都要添加目标地址信息
+3. 调用sendto即会自动分配IP和端口&lt;/p&gt;
+
+&lt;p&gt;####5.UDP数据传输特效
+#####1. TCP不存在数据边界，传输过程中调用I/O函数的次数不具备任何意义
+#####2. UDP具有数据边界协议，调用I/O函数的次数读写必须一致
+#####3. UDP也可以调用connect函数，不是为了建立连接，而是注册目标IP和端口号&lt;/p&gt;
+
+&lt;p&gt;##第八章
+###域名和网络地址
+####1. 域名是赋予服务端的虚拟地址，IP才是真实地址
+####2. DNS服务器则是负责解析域名为IP地址&lt;/p&gt;
+
+&lt;p&gt;##第十章
+###多并发的服务器
+1. 多进程的服务器
+2. 基于select函数实现
+    * 同时监视多个文件描述符（套接字）
+3. 基于epoll函数实现的并发
+    * 原理和select一样，不同在于用操作系统负责保存监视对象文件描述符
+4. 多线程的服务端&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Copyright 2015 WangLin&lt;/p&gt;
+
+&lt;!-- create time: 2015-11-22 14:55:20  --&gt;
+</description>
+        <pubDate>Sun, 22 Nov 2015 22:55:20 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/11/22/TCP&IP/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/11/22/TCP&IP/</guid>
+        
+        <category>TCP/IP</category>
+        
+        <category>网络协议</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Spine &amp; Cocos2d-X</title>
+        <description>&lt;h1 id=&quot;spine&quot;&gt;Spine的使用接入&lt;/h1&gt;
+&lt;!-- *************************
+# -*- coding:utf-8 -*-
+# author: WangLin &lt;276293337@qq.com&gt;
+# filename: Spine的使用接入.md
+# description: TODO
+# create date: 2015-09-12 14:34:17
+************************** --&gt;
+
+&lt;h3 id=&quot;spine-1&quot;&gt;Spine的使用&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;创建并使用对象&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     创建spine对象    
+     spineboy = sp.SkeletonAnimation:create(s_pPathSpineBoyJson, s_pPathSpineBoyAtlas, 1.0）
+        
+     设置播放的动作
+     spineboy:setAnimation(0, &quot;jineng&quot;, true)
+        
+     开启debug模式，可以看骨骼
+     spineboy:setDebugBonesEnabled(true)
+     spineboy:setDebugSlotsEnabled(true)
+        
+     更换皮肤
+     spineboy:setSkin(&quot;goblin&quot;)
+        
+     设置两个动作的衔接
+     spineboy:setMix(&quot;siwang&quot;,&quot;yidong&quot;,0.3)
+        
+     设置播放速度
+     spineboy:setTimeScale(1)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;帧事件注册&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     开始事件
+     spineboy:registerSpineEventHandler(function (event)
+         print(&quot;wanglin 开始事件：event.trackIndex, event.animation &quot;,event.trackIndex, event.animation)
+     end, sp.EventType.ANIMATION_START)
+        
+     单次播放的结束事件
+     spineboy:registerSpineEventHandler(function (event)
+         print(&quot;wanglin 结束事件：event.trackIndex &quot;,event.trackIndex)
+     end, sp.EventType.ANIMATION_END)
+
+     循环播放的结束事件
+     spineboy:registerSpineEventHandler(function (event)
+         print(&quot;wanglin 循环事件：event.trackIndex，event.loopCount &quot;,event.trackIndex,event.loopCount)
+     end, sp.EventType.ANIMATION_COMPLETE)
+
+     帧事件定义
+     spineboy:registerSpineEventHandler(function (event)
+         print(&quot;wanglin 自定义帧事件  event.trackIndex,event.eventData.name,event.eventData.intValue,event.eventData.floatValue,event.eventData.stringValue &quot;,
+         event.trackIndex,
+         event.eventData.name,
+         event.eventData.intValue,
+         event.eventData.floatValue,
+         event.eventData.stringValue)
+     end, sp.EventType.ANIMATION_EVENT)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;spine-2&quot;&gt;Spine的优点&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;使用mesh来做人物的细腻表现&lt;/li&gt;
+  &lt;li&gt;使用动画混合（setMix）来做动作间的自动衔接&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;spine-3&quot;&gt;Spine的缺点&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;资源的使用方式和cocos不同，没有cache来缓存管理atlas文件，解决办法是缓存Atlas文件，用&lt;strong&gt;SkeletonAnimation::SkeletonAnimation (const std::string&amp;amp; skeletonDataFile, spAtlas* atlas, float scale)&lt;/strong&gt;来创建SkeletonAnimation对象&lt;/li&gt;
+  &lt;li&gt;骨骼皮肤的替换问题，由于不是用精灵来做节点，被替换来选择的皮肤必须先安放好在同个slot上&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;spine-4&quot;&gt;Spine的改进&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;添加SpineCache类来管理altas和json文件，缓存数据，同时具备异步加载功能&lt;/li&gt;
+  &lt;li&gt;添加接口判断是否存在某个动作&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;注意事项&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;1.8版本以上的atlas做了修改 在第二行添加了size 所以只要删除size这一行即可，升级cocos2d的spine版本到官方最新版即可解决&lt;/li&gt;
+  &lt;li&gt;每个动作播放完成后，当前状态会延续影响到下个动作的播放，造成播放异样，需要动作播放完成后，调用重置转配状态的函数&lt;strong&gt;SetToSetUp接口&lt;/strong&gt;，&lt;a href=&quot;http://www.cgjoy.com/thread-101436-1-1.html&quot;&gt;参考描述&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;spine没有自身封装的暂停和恢复接口，可以使用&lt;strong&gt;setTimeScale&lt;/strong&gt;或者使用Node的&lt;strong&gt;pause&lt;/strong&gt;和&lt;strong&gt;resume&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;部分动作的循环播放，同样出现第一次会影响后面的播放，解决办法是可以在循环的结束事件调用转配函数来重置状态&lt;/li&gt;
+  &lt;li&gt;spine的帧事件命名直接填写，而flash需要有&lt;em&gt;@&lt;/em&gt;做前缀，flash才会识别出这个是帧事件&lt;/li&gt;
+  &lt;li&gt;不能在spine的完成或者结束事件中，移除自身&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;参考：&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://blog.csdn.net/vagrxie/article/details/9077311&quot;&gt;Spine的使用(With Cocos2d-x)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://my.oschina.net/ffs/blog/316972&quot;&gt;cocos2dx3.2 spine动画&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.tairan.com/archives/9981&quot;&gt;spine的基础界面和导出熟悉&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Copyright 2015 WangLin&lt;/p&gt;
+
+&lt;!-- This file is created from $MARBOO_HOME/.media/starts/default.md
+本文件由 $MARBOO_HOME/.media/starts/default.md 复制而来 --&gt;
+
+</description>
+        <pubDate>Sat, 12 Sep 2015 22:34:17 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/09/12/Spine%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8E%A5%E5%85%A5/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/09/12/Spine%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8E%A5%E5%85%A5/</guid>
+        
+        <category>Cocos2d-x</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Cocos Studio</title>
+        <description>&lt;h1 id=&quot;ccs&quot;&gt;新版本(2.2.1.0)的CCS评估测试&lt;/h1&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;##新版本Cocos Studio的重要功能简介
+* ###支持通过命令行来发布项目和资源文件
+* ###导出发布资源的多样化，有csb，json，lua
+* ###Cocos可以与IDE，和Android，IOS配合，搭建工程开发并自动打包
+* ###自定义的Lua控件
+* ###支持事件的回调特性使用&lt;/p&gt;
+
+&lt;p&gt;##Cocos与项目中的使用的Cocos Studio对比
+* ###版本对比
+    * ####项目中的使用
+        * #####Cocos Studio 1.5.0.1
+        * #####2dx 3.2
+    * ####新版本的使用
+        * #####Cocos Studio 2.2.1.0
+        * #####2dx 3.4（部分功能需要3.5才能支持）
+* ###导出文件的使用对比
+    * ####项目中的使用
+        * #####用json做UI，特点：
+            * ######可以直接修改json文件
+            * ######可逆性，修改过的json可以导入ccs中重新进行编辑
+            * ######轻量级，占用空间小
+            * ######可读性强
+            * ######安全性低，没有做加密
+    * ####新版本的使用
+        * #####用Lua做UI，特点：
+            * ######可以直接修改Lua代码
+            * ######可逆性，不可以导入ccs重新编辑界面
+            * ######占用空间小，但比json文件稍大
+            * ######可读性强，更加易于拓展
+            * ######安全性高，可以使用luajit或luac编译
+            * ######渲染效率更高，直接使用Node和Sprite等对象，不需要文件的解析过程
+* ###使用上的对比
+    * ####项目中的使用&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        使用json库进行解析，然后将返回值做为root节点进行使用
+        root = ccs.GUIReader:getInstance():widgetFromJsonFile(&quot;assets/ui_json/card_formation.json&quot;)	
+        
+* ####新版本的使用
+
+        在lua中require对应的文件导出文件，然后调用其中的create函数即可
+        root = require(&quot;Scene.lua&quot;).create()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;###关注的问题
+    &lt;ul&gt;
+      &lt;li&gt;####支持对旧版本Json文件的兼容&lt;/li&gt;
+      &lt;li&gt;####把json改成用lua，使用上不复杂，可以接受&lt;/li&gt;
+      &lt;li&gt;####新版本的ccs编辑界面过程更加流畅&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##分析
+* ###根据文件的安全性和在程序中渲染的效率性考虑，可以改用新版本的导出Lua文件代替旧版本的Json文件，但目前json的UI文件渲染不是关键性的元素，优化的必要性不大；
+* ###另外有个不符合团队开发的习惯，即对导出的lua的界面文件重新编辑后不支持导入ccs中重新编辑，习惯上的使用上不方便；
+* ###需要升级2d-x的版本，升级到3.5版本。目前有升级引擎的经验，3个人对升级进行维护的话，预计15个工作日内可以完成。&lt;/p&gt;
+
+&lt;p&gt;##结论
+* ###升级2dx，改用Cocos 2.2.1版本的方案做的必要性不强，不推荐&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Copyright 2015 WangLin
+&lt;!-- create time: 2015-04-07 14:14:18  --&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 07 Apr 2015 22:14:18 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/04/07/%E6%96%B0%E7%89%88%E6%9C%AC%E7%9A%84CCS%E8%AF%84%E4%BC%B0-V2.0/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/04/07/%E6%96%B0%E7%89%88%E6%9C%AC%E7%9A%84CCS%E8%AF%84%E4%BC%B0-V2.0/</guid>
+        
+        <category>Cocos2d-x</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>对象模型设计</title>
+        <description>&lt;h1 id=&quot;section&quot;&gt;游戏对象模型&lt;/h1&gt;
+
+&lt;!-- create time: 2015-03-28 19:31:50  --&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;##以对象为中心的架构设计
+* ####特点：
+    1. 借助面向对象语言的继承和重载，为所有的对象构建特定的类型定义
+    2. 以对象为中心的架构，强调的是对象通常由一个特定的数据结构类型来定义
+    3. 继承——is a的关系
+    4. 组合——has a的关系（生命周期一致为合成，不一致为聚合）
+* ####存在的问题：
+    1. 复杂的层次结构
+        + 所有对象继承自基类，游戏对象类型越多，继承树越复杂
+        + 继承树深导致难以阅读和修改，理解一个类的功能先要了解其父类功能
+        + 理解和维护困难
+    2. 分类学瓶颈
+        + 继承树中对象的分类设计，基于特定的分类标准
+        + 新需求可能造成与现有的分类标准冲突，如英雄拥有怪物的某些特性
+    3. 多重继承
+        + 新类型是几个现有类型的组合，导致拥有不必要的属性继承
+    4. 冒泡效应
+        + 当新需求破坏分类规则时，会把通用功能往基类移动，即冒泡效应
+        + 导致父类最后有很多游戏对象的行为；也导致子类只定义感兴趣的行为，其他属性类型屏蔽但占据不必要的数据内存
+    5. 恶性循环的重构&lt;/p&gt;
+
+&lt;p&gt;##组件模型的架构设计
+* ####仍然是以对象为中心的设计，以合成的形式来组合对象
+* ####只有合成，没有继承
+    1. 将每个功能分类成一个单一独立的接口，使用合成的方式组合成一个对象
+    2. 单一功能的类成为组件，根据功能需要进行选择，维护和重构方便
+* ####组件的创建和拥有权
+    + 类管理组件的生命周期，初始化时则必须知道要使用的组件
+    + 实现方法：
+        1. 对象继承GameObj，子类的构造函数中初始化自己感兴趣的组件
+        2. 组件继承自基类，而GameObj拥有一个组件的链表或容器；则游戏对象不关心有哪些组件类型，并且可以拥有任意数量的组件——Unity3D的游戏对象架构设计
+            * 好处：根据文本文件定义的游戏对象类型，决定游戏对象创建哪些组件&lt;/p&gt;
+
+&lt;p&gt;##以属性为中心的架构设计
+* ###内存布局比较
+    + ####以对象为中心的内存布局&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        * 对象1：
+            位置（10，20，30）
+            方向（左）
+        * 对象2：
+            位置（5，8，0）
+            血量（20）
+        * 对象3：
+            方向（右）
+            
++ ####以属性为中心的内存布局，类似于数据库（与lua表结构的优化有些相似）
+
+        * 位置：
+            对象1（10，20，30）
+            对象2（5，8，0）
+        * 血量：
+            对象2（20）
+        * 方向：
+            对象1（左）
+            对象3（右）
+        对象是属性的索引值，表明该属性属于哪个对象
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;###以属性为中心的架构包含属性和行为，通过两种方式可以定义对象的行为
+    &lt;ul&gt;
+      &lt;li&gt;
+        &lt;p&gt;通过属性类实现&lt;/p&gt;
+
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  1、每个属性实现为一个类，包含属性数据的定义和行为
+      如：代表血量的属性，定义血量的值，通过受伤扣血，血少死亡的成员函数来表现行为
+  2、和组件的区别在于内存的分配上，组件实例分布于各个游戏对象中
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;p&gt;通过脚本实现&lt;/p&gt;
+
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  1、每个属性对应一个脚本函数，通过脚本实现对象的行为
+  2、游戏对象包含哪些属性，系统则运行属性对应的脚本来处理游戏对象行为
+  3、例子：末日危城
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;###优点
+    &lt;ol&gt;
+      &lt;li&gt;更高效利用内存&lt;/li&gt;
+      &lt;li&gt;相同类型的属性实例在内存中是连续的存储的，成为数组化结构；对象模型的数据布局为结构化数组&lt;/li&gt;
+      &lt;li&gt;更容易实现数据驱动，通过定义属性列表或者通过脚本添加新的属性类型来实现对象的创建&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;###缺点
+    &lt;ol&gt;
+      &lt;li&gt;属性都在属性表中，调试不方便&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##Entity Component System
+* ###特点：
+    1. 以属性为中心，采用数据库类似的结构来存储对象
+    2. 实现高度的数据驱动 
+* ###属性结构：
+    * ####Entity&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        1、表示游戏对象，只包含一个表示对象ID的唯一标识符
+        2、拥有Component集合，不同类型的集合组成特定的游戏对象，Entity为属性
+
+* ####Component
+
+        1、属性的数据部分，只包含一些get/set方法和内部数据处理方法，不含实例方法
+        
+* ####System
+    
+        1、属性的行为方法，检测属性的值，但条件达到时进行发出通知事件
+        2、由游戏循环驱动来修改游戏对象的状态，包含一个update方法
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;###与组件模型的区别：
+    &lt;ul&gt;
+      &lt;li&gt;属性的数据和行为是分开的，并且一一对应&lt;/li&gt;
+      &lt;li&gt;组件是同时包含数据和行为&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;###分离数据和行为：
+    &lt;ul&gt;
+      &lt;li&gt;####好处
+        &lt;ol&gt;
+          &lt;li&gt;多个行为可能共享一些数据&lt;/li&gt;
+          &lt;li&gt;内存布局上保证所有属性实例占据连续的内存空间，以对象的唯一标识符作为主key储存对象实例&lt;/li&gt;
+          &lt;li&gt;行为从数据中分离，作为纯算法存在，不需要构建实例（实例的方法存在一个方法表中）；则一百个对象拥有某个属性时，该属性对应的方法地址则是一个，而不是一百个&lt;/li&gt;
+        &lt;/ol&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;p&gt;###逻辑的更新过程&lt;/p&gt;
+
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  每帧更新时，执行每个System行为的update方法
+  一个System实例找到对应的一个Component实例
+  每个Component实例对应的Entity执行逻辑更新，则将行为作用在Entity上
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;###数据驱动
+        &lt;ul&gt;
+          &lt;li&gt;#####属性值
+            &lt;ul&gt;
+              &lt;li&gt;######将可能会修改的属性加入到数据表，一种对对象属性值的驱动&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;#####对象结构
+            &lt;ul&gt;
+              &lt;li&gt;######驱动游戏对象的属性值
+                &lt;ul&gt;
+                  &lt;li&gt;需要修改摸个属性时，只需要单独修改相应的属性&lt;/li&gt;
+                &lt;/ul&gt;
+              &lt;/li&gt;
+              &lt;li&gt;######驱动游戏对象结构
+                &lt;ul&gt;
+                  &lt;li&gt;需要给对象新增一个行为时，只需要对该对象添加属性即可&lt;/li&gt;
+                &lt;/ul&gt;
+              &lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;#####事件脚本（未完全明白）&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;###对象查找与消息的更新:
+    &lt;ul&gt;
+      &lt;li&gt;####根据唯一标识符查询对象
+        &lt;ul&gt;
+          &lt;li&gt;#####存储对象名的hash值，便于查询。如 Node::setName &amp;amp;&amp;amp;     Node::getChildByName&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;####根据类型查询
+        &lt;ul&gt;
+          &lt;li&gt;#####在ECS中通过获取某个属性的实例来获取游戏对象。如 getAllEntitiesPosessingCom&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;####面向类型编程
+        &lt;ul&gt;
+          &lt;li&gt;#####通过类型查找到对象的集合，再对拥有该属性类型的对象进行操作，即面向类型编程&lt;/li&gt;
+          &lt;li&gt;#####通过类型查找到对象，再由对象查找到该对象拥有的其他类型属性数据&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;####桶式更新
+        &lt;ul&gt;
+          &lt;li&gt;#####原理：特定对象需要另外某个特定对象执行完所有更新状态之后才开始执行该对象的系统更新&lt;/li&gt;
+          &lt;li&gt;#####例如：Entity4需要等到Entity1更新完毕后再更新。&lt;/li&gt;
+          &lt;li&gt;#####在ECS中即对对象分组，称为桶，每个桶按从小到大的顺序进行更新，在Entity::setBucket中对对象设置一个桶号&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Copyright 2015 WangLin&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 29 Mar 2015 03:31:50 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/03/29/%E6%B8%B8%E6%88%8F%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/03/29/%E6%B8%B8%E6%88%8F%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</guid>
+        
+        <category>Cocos2d-X</category>
+        
+        <category>游戏对象模型</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>DragonBone 3.0 &amp; Cocos2d-X</title>
+        <description>&lt;h1 id=&quot;dragonbone-30-&quot;&gt;DragonBone 3.0 的接入使用&lt;/h1&gt;
+
+&lt;!-- create time: 2015-03-19 20:54:24  --&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;##DragonBone的简介&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    DragonBones是一套开源的 2D骨骼动画框架和工具，它包含了基于Flash Pro的骨骼动画编辑面板DragonBonesDesignPanel及骨骼动画ActionScript框架。
+    它可以让开发者运用熟悉的Flash Pro元件及时间轴编辑方式，快速创建2D骨骼动画，并运用到Flash或其他技术的应用中。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;##Dragonbone的下载和安装设置
++ &lt;a href=&quot;http://dragonbones.github.com&quot;&gt;开源项目地址&lt;/a&gt;
++ 必须使用Adobe Flash Pro 5.5或以上版本
++ 下载最新的DragonBones release 包，安装支持Flash Pro的骨骼面板扩展插件SkeletonDesignPanel.zxp （注：此插件目前仅支持Flash Pro5.5及以上版本）， 获取骨骼动画ActionScript库SkeletonAnimationLibrary。&lt;/p&gt;
+
+&lt;p&gt;##DragonBone在Flash上的使用
++ &lt;a href=&quot;http://dragonbones.github.io/getting_started_cn.html&quot;&gt;制作参考&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;##DragonBone在代码上的使用（主要在Cocos2dx中的使用）
++ 加载导出资源&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    local factory = db.DBCCFactory:getInstance()
+	factory:loadDragonBonesData(&quot;assets/skeleton.xml&quot;, &quot;smithy_effect_2&quot;)
+	factory:loadTextureAtlas(&quot;assets/texture.xml&quot;, &quot;smithy_effect_2&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;创建动画对象并进行播放&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  local dbnode = factory:buildArmatureNode(&quot;smithy_effect_2&quot;)        
+  dbnode:getAnimation():gotoAndPlay(&quot;f&quot;,-1,-1,0)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;播放动作的函数解析说明&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  gotoAndPlay(    
+      const std::string &amp;amp;animationName,
+      float fadeInTime = -1.f,
+      float duration = -1.f,
+      int playTimes = -1,
+      int layer = 0,
+      const std::string &amp;amp;group = &quot;&quot;,
+      AnimationFadeOutMode fadeOutMode =  AnimationFadeOutMode::SAME_LAYER_AND_GROUP,
+      bool pauseFadeOut = true,
+      bool pauseFadeIn = true
+  );
+  默认参数为-1，表示根据flash中制作的参数进行播放
+  playTimes为0时表示循环播放
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;帧事件的注册和触发&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  dbnode:registerFrameEventHandler(function (event)
+  		-- body
+  		print(&quot;帧事件参数列表&quot;)
+  		print(event.armature)
+  		print(event.armatureNode)
+  		print(event.type)             对应于dragonbones::EventData::EventType
+  		print(event.boneName)         图层名
+  		print(event.animationName)    动作名
+  		print(event.frameLabel)
+  		print(event.isLastAnimation)       
+  end)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;完成事件的注册和触发，也叫动画事件&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  dbnode:registerAnimationEventHandler(function (event)
+  		-- body
+  		print(&quot;完成事件参数列表&quot;)
+  		print(event.armature)
+  		print(event.armatureNode)
+  		print(event.type)
+  		print(event.animationName)
+  		print(event.isLastAnimation)
+  end)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;更换骨骼图层&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  local bone = dbnode:getCCSlot(boneName)
+  if not bone then
+      return
+  end
+  local displayNode = bone:getCCDisplay()
+  if not displayNode then
+      return
+  end
+  local resourePath = ResConfig.getPathByPng(resoureName)
+  if not resourePath then
+      print(&quot;没有找到资源&quot;,resoureName)
+      return
+  end
+
+  --设置新资源
+  local resourcePng = cc.Sprite:create(resourePath)
+  local oldResPos = displayNode:getPosition()
+  local oldResApos = displayNode:getAnchorPoint()
+  resourcePng:setPosition(oldResPos)
+  resourcePng:setAnchorPoint(oldResApos)
+  --更换资源
+  bone:setDisplayImage(resourcePng)   
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;特效表现，xml文件中对应的blendMode字段
+    &lt;ul&gt;
+      &lt;li&gt;
+        &lt;p&gt;拥有叠加和增加效果、高级效果&lt;/p&gt;
+
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  在 XMLDataParser::parseSlotData 中对xml的数据进行解析
+  在 DBCCSlot::updateDisplayBlendMode 中对模式进行渲染
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Lua接口绑定的问题
+    &lt;ul&gt;
+      &lt;li&gt;需要开启 DRAGON_BONES_ENABLE_LUA 的宏才能对帧事件和完成事件的回调进行注册&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##DragonBone的优点
+- 跟Cocostudio相比，美术人员的上手成本低，Flash的制作方式+dragonbone的导出面板即可完成
+- 增加美术人员的开发效率，自转和弧形移动不需要使用密集关键帧来解决
+- 增加美术的表现
+    + 和低版本的Dragonbone相比，3.0版本可以使用元件套元件的movieClip来表现
+    + 做人物动作时，各动作间形成自动补间动画，可以更细腻表现&lt;/p&gt;
+
+&lt;p&gt;##Dragonbone的缺点
+- 依赖于Flash，Flash制作上存在的缺点和局限都会直接影响Dragonbone的效果
+- Flash的制作上，特效表现的图片位移大时，导出的Dragonbone的自动补间处理可能会导致错位。解决办法一种是修改表现，一种是打关键帧，并且需要修改Dragonbone的源码，取消相邻两帧是关键帧时不做自动补间的处理
+- Flash使用的混合模式，部分Dragonbone不支持，影响一定的特效表现&lt;/p&gt;
+
+&lt;p&gt;##注意事项
++ Dragonbone的setRenderMode需要重写才有效果
++ 使用movieClip进行循环播放时，不会触发完成事件
++ 人物模型的帧事件触发特效文件时，会出现第一次播放走位的问题，需要在fla中设定帧事件在动作第一帧存在，但到需要播放时才出现，或者修改Bone.cpp的代码，在帧事件传位置出来时，调用位置更新的方法，如图[!pic]
++ 模型在完成事件中调用stop时，会停在fla的第一帧上
++ dragonbone仍然会出现边间位置的错误性，需要修改代码&lt;/p&gt;
+
+&lt;p&gt;##DragonBone参考
+* &lt;a href=&quot;http://dragonbones.effecthub.com/getting_started_cn.html&quot;&gt;DragonBone的入门介绍&lt;/a&gt;
+* &lt;a href=&quot;https://github.com/DragonBones/DragonBonesCPP&quot;&gt;DragonBone的库和demo&lt;/a&gt;
+* &lt;a href=&quot;https://github.com/DragonBones/DesignPanel&quot;&gt;对应的Flash导出插件&lt;/a&gt;
+* &lt;a href=&quot;http://www.litefeel.com/how-to-do-lua-bindings-for-dragonbones-vs/&quot;&gt;库工程加入到Cocos2d及Lua接口绑定&lt;/a&gt;
+* &lt;a href=&quot;http://www.litefeel.com/how-to-do-lua-bindings-for-dragonbones-android/&quot;&gt;DragonBone在Android接口上的绑定&lt;/a&gt;
+* &lt;a href=&quot;http://www.litefeel.com/how-to-use-dragonbones-in-lua/&quot;&gt;Lua上对DragonBone的接口调用&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;Copyright 2015 WangLin&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 20 Mar 2015 04:54:24 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/03/20/DragonBone%E7%9A%84%E6%8E%A5%E5%85%A5%E4%BD%BF%E7%94%A8/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/03/20/DragonBone%E7%9A%84%E6%8E%A5%E5%85%A5%E4%BD%BF%E7%94%A8/</guid>
+        
+        <category>Cocos2d-x</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Cocos2d-X</title>
+        <description>&lt;h1 id=&quot;cocos2d-x&quot;&gt;Cocos2d-X零碎总结&lt;/h1&gt;
+
+&lt;!-- create time: 2015-03-19 01:41:51  --&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;##一帧中的处理过程
+* 用户输入
+* 动画计算
+* 物理模拟
+* 逻辑更新
+* UI树遍历
+* 绘制
+* 交换缓冲区
+* 释放&lt;/p&gt;
+
+&lt;p&gt;##OpenGL ES 管线流程
+* 顶点数组
+* 顶点着色器
+* 图元组装——将本地坐标系转换成屏幕坐标系
+* 光棚化——图元转为片段
+* 片段着色器
+* 片段操作——各种测试
+* 帧缓冲 Framebuffer&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 19 Mar 2015 09:41:51 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/03/19/Cocos%E9%9B%B6%E7%A2%8E%E6%80%BB%E7%BB%93/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/03/19/Cocos%E9%9B%B6%E7%A2%8E%E6%80%BB%E7%BB%93/</guid>
+        
+        <category>Cocos2d-x</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>绘制系统</title>
+        <description>&lt;h1 id=&quot;section&quot;&gt;绘制系统&lt;/h1&gt;
+
+&lt;!-- create time: 2015-03-19 00:43:15  --&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;#Cocos2d-X 3.0绘制系统
+##绘制顺序流程
+* 生成绘制命令
+    + 新的绘制系统，将绘制相关的东西从UI元素中分离
+    + UI元素的绘制，会对应一个RenderCommand的绘制类型（定义如何绘制一个UI元素）
+    + 重写 Node::draw()方法，将绘制命令发送给renderer(将命令放入栈中)&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        _quadCommnd.init()
+        renderer-&amp;gt;addCommand(&amp;amp;_quadCommand) 
+        
++ 实现每个元素的绘制从UI树中分离 * 对绘制命令进行排序
++ UI元素全部遍历完后renderer对栈上的命令进行进行排序 * 执行绘制命令
++ 对排序完的绘制命令进行绘制
++ Sprite中，两个QuadCommand相邻且使用相同纹理、着色器等时，renderer会将他们组合成一个QuadCommand，称为自动批绘制。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;##什么是RenderCommand
+1. RenderCommand是一个特定绘制方式的封装（纹理，顶点，OpenGL ES绘制命令）
+2. 系统的每一次绘制都是调用一个RenderCommand
+3. 相邻的QuadCommand使用相同的纹理，则可以实现自动批绘制
+4. RenderCommand的类型：
+    + Quad_Command:绘制矩形区域，可以实现批绘制
+    + Batch_Command:绘制TextureAtlas（Lable TileMap）
+    + Group_Command:用来包装多个RenderCommand的集合，实现裁剪（ClippingNode）和绘制子元素到纹理（RenderTexture）
+5. 在RenderQueue绘制命令栈中的规则
+    + RenderCommand的globalOrder来自于Node的globalZOrder属性
+    + Node的globalZOrder默认为0，globalZOrder为0的命令不参与排序
+    + GroupCommand中的绘制命令不参与全局排序&lt;/p&gt;
+
+&lt;p&gt;##什么是Renderer
+* Renderer中用_renderGroups存多个RenderQueue，所有的绘制命令都存放在这里
+* Renderer即为主绘制栈
+* _renderGroups：索引值为0的RenderQueue绘制栈&lt;/p&gt;
+
+&lt;p&gt;##绘制的时机
+* 绘制和UI树分离，下一帧才执行绘制命令&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;参考：《我所理解的Cocos2d-x》第四章&lt;/p&gt;
+</description>
+        <pubDate>Thu, 19 Mar 2015 08:43:15 +0800</pubDate>
+        <link>http://www.perfectworld.space/welcome.php/2015/03/19/%E7%BB%98%E5%88%B6%E7%B3%BB%E7%BB%9F/</link>
+        <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/03/19/%E7%BB%98%E5%88%B6%E7%B3%BB%E7%BB%9F/</guid>
+        
+        <category>Cocos2d-x</category>
+        
+        
+      </item>
     
       <item>
         <title>绘制 &amp; Shader</title>
@@ -116,11 +1191,11 @@
 2. 修改Shader_Name_Position_Texture_Color_No_MVP会导致没有叠加效果&lt;/p&gt;
 
 </description>
-        <pubDate>Sun, 25 Jan 2015 20:00:00 +0800</pubDate>
+        <pubDate>Sun, 25 Jan 2015 22:48:13 +0800</pubDate>
         <link>http://www.perfectworld.space/welcome.php/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B/</link>
         <guid isPermaLink="true">http://www.perfectworld.space/welcome.php/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B/</guid>
         
-        <category>生活</category>
+        <category>Cocos2d-x</category>
         
         
       </item>

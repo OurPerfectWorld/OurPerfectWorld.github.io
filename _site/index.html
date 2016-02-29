@@ -177,6 +177,312 @@
             ">
     			
 <div class="post-preview">
+    <a href="/2016/01/28/APNS%E6%8E%A5%E5%85%A5%E7%9A%84%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/">
+        <h2 class="post-title">
+            APNS & IOS
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "APNS接入的流程总结"
+        </h3>
+        
+        <div class="post-content-preview">
+            APNS接入的流程总结
+
+
+
+APNS接入步骤
+#### 前期的三个文件准备
+* CSR 从keyChain导出的请求证书
+* aps_development.cer 通过上传CSR导出的文件
+* ck.p12 安装aps_development.cer后，出现Apple Development IOS Push Services，从中导出的密钥文件
+
+执行步骤
+
+  方法一
+    
+  ...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on January 28, 2016
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2016/01/28/Remote%E7%9A%84%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B/">
+        <h2 class="post-title">
+            推送技术选择
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "Remote的技术选型"
+        </h3>
+        
+        <div class="post-content-preview">
+            Remote的技术选型
+
+
+Remote
+
+  
+    定义
+
+      服务器信息的远程推送，推送到指定的客户端，不管客户端是开启状态 or 后台状态 or 关闭状态，都可以实时提醒
+
+    
+  
+
+
+推送技术的评估
+##### Android平台
+* Google官方提高的GCM
+    * 存在问题
+        1. Android很多被手机厂商定制化，厂商可能会去掉GCM...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on January 28, 2016
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/11/22/TCP&IP/">
+        <h2 class="post-title">
+            TCP & IP
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "TCP&IP"
+        </h3>
+        
+        <div class="post-content-preview">
+            TCP/IP
+
+##第一章
+###服务端套接字
+####1. 构建过程
+1. 调用socket创建套接字（安装电话）
+2. 调用bind分配IP和端口号（分配电话号码）
+3. 调用listen将套接字转为可以连接状态（连接电话线）
+4. 调用accept受理连接请求，有连接请求时会有返回（拿起电话筒）
+5. 调用write来传输数据
+
+###客户端套接字
+####1. 构建过程
+1. 调用s...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on November 22, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/09/12/Spine%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8E%A5%E5%85%A5/">
+        <h2 class="post-title">
+            Spine & Cocos2d-X
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "Spine的使用接入"
+        </h3>
+        
+        <div class="post-content-preview">
+            Spine的使用接入
+
+
+Spine的使用
+
+
+  
+    创建并使用对象
+
+         创建spine对象    
+     spineboy = sp.SkeletonAnimation:create(s_pPathSpineBoyJson, s_pPathSpineBoyAtlas, 1.0）
+        
+     设置播放的动作
+     spineboy:setAni...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on September 12, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/04/07/%E6%96%B0%E7%89%88%E6%9C%AC%E7%9A%84CCS%E8%AF%84%E4%BC%B0-V2.0/">
+        <h2 class="post-title">
+            Cocos Studio
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "新版本(2.2.1.0)的CCS评估测试"
+        </h3>
+        
+        <div class="post-content-preview">
+            新版本(2.2.1.0)的CCS评估测试
+
+
+
+##新版本Cocos Studio的重要功能简介
+* ###支持通过命令行来发布项目和资源文件
+* ###导出发布资源的多样化，有csb，json，lua
+* ###Cocos可以与IDE，和Android，IOS配合，搭建工程开发并自动打包
+* ###自定义的Lua控件
+* ###支持事件的回调特性使用
+
+##Cocos与项目中的使用的Coc...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on April 7, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/03/29/%E6%B8%B8%E6%88%8F%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/">
+        <h2 class="post-title">
+            对象模型设计
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "游戏对象模型"
+        </h3>
+        
+        <div class="post-content-preview">
+            游戏对象模型
+
+
+
+
+##以对象为中心的架构设计
+* ####特点：
+    1. 借助面向对象语言的继承和重载，为所有的对象构建特定的类型定义
+    2. 以对象为中心的架构，强调的是对象通常由一个特定的数据结构类型来定义
+    3. 继承——is a的关系
+    4. 组合——has a的关系（生命周期一致为合成，不一致为聚合）
+* ####存在的问题：
+    1. 复杂的层次结...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on March 29, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/03/20/DragonBone%E7%9A%84%E6%8E%A5%E5%85%A5%E4%BD%BF%E7%94%A8/">
+        <h2 class="post-title">
+            DragonBone 3.0 & Cocos2d-X
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "DragonBone 3.0"
+        </h3>
+        
+        <div class="post-content-preview">
+            DragonBone 3.0 的接入使用
+
+
+
+
+##DragonBone的简介
+
+    DragonBones是一套开源的 2D骨骼动画框架和工具，它包含了基于Flash Pro的骨骼动画编辑面板DragonBonesDesignPanel及骨骼动画ActionScript框架。
+    它可以让开发者运用熟悉的Flash Pro元件及时间轴编辑方式，快速创建2D骨骼动画，并运用到Fla...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on March 20, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/03/19/Cocos%E9%9B%B6%E7%A2%8E%E6%80%BB%E7%BB%93/">
+        <h2 class="post-title">
+            Cocos2d-X
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "Cocos2d-X零碎总结"
+        </h3>
+        
+        <div class="post-content-preview">
+            Cocos2d-X零碎总结
+
+
+
+
+
+##一帧中的处理过程
+* 用户输入
+* 动画计算
+* 物理模拟
+* 逻辑更新
+* UI树遍历
+* 绘制
+* 交换缓冲区
+* 释放
+
+##OpenGL ES 管线流程
+* 顶点数组
+* 顶点着色器
+* 图元组装——将本地坐标系转换成屏幕坐标系
+* 光棚化——图元转为片段
+* 片段着色器
+* 片段操作——各种测试
+* 帧缓冲 Framebuffer
+
+
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on March 19, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2015/03/19/%E7%BB%98%E5%88%B6%E7%B3%BB%E7%BB%9F/">
+        <h2 class="post-title">
+            绘制系统
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "绘制系统"
+        </h3>
+        
+        <div class="post-content-preview">
+            绘制系统
+
+
+
+
+#Cocos2d-X 3.0绘制系统
+##绘制顺序流程
+* 生成绘制命令
+    + 新的绘制系统，将绘制相关的东西从UI元素中分离
+    + UI元素的绘制，会对应一个RenderCommand的绘制类型（定义如何绘制一个UI元素）
+    + 重写 Node::draw()方法，将绘制命令发送给renderer(将命令放入栈中)
+
+        _quadCommn...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Minato on March 19, 2015
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
     <a href="/2015/01/25/%E7%BB%98%E5%88%B6%E5%B1%9E%E6%80%A7%E4%B8%8EShader%E7%BC%96%E7%A8%8B/">
         <h2 class="post-title">
             绘制 & Shader
@@ -209,6 +515,15 @@
 
 <!-- Pager -->
 
+<ul class="pager">
+    
+    
+    <li class="next">
+        <a href="/page2">Older Posts &rarr;</a>
+    </li>
+    
+</ul>
+
 
     		</div>
     <!-- Sidebar Container -->
@@ -228,6 +543,44 @@
                         
                             
                         
+                            
+                        
+                            
+                                <a href="/tags/#IOS" title="IOS" rel="2">
+                                    IOS
+                                </a>
+                            
+                        
+                            
+                        
+                            
+                                <a href="/tags/#Cocos2d-X" title="Cocos2d-X" rel="2">
+                                    Cocos2d-X
+                                </a>
+                            
+                        
+                            
+                        
+                            
+                                <a href="/tags/#Cocos2d-x" title="Cocos2d-x" rel="6">
+                                    Cocos2d-x
+                                </a>
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                                <a href="/tags/#推送" title="推送" rel="2">
+                                    推送
+                                </a>
+                            
+                        
+                            
+                        
                     </div>
                 </section>
                 
@@ -240,7 +593,8 @@
                             <img src="/img/avatar-minato.jpg" />
                         
                         
-                            <p>越努力，越幸运。Learning By Doing.</p>
+                            <p>越努力，越幸运 
+ Learning By Doing.</p>
                         
                         <!-- SNS Link -->
                         <ul class="list-inline">
@@ -248,7 +602,7 @@
                             
                             
                             <li>
-                                <a target="_blank" href="https://www.zhihu.com/people/276293337@qq.com">
+                                <a target="_blank" href="https://www.zhihu.com/people/wang-si-gong-zi">
                                     <span class="fa-stack fa-lg">
                                         <i class="fa fa-circle fa-stack-2x"></i>
                                         <i class="fa  fa-stack-1x fa-inverse">知</i>
@@ -258,7 +612,7 @@
                             
                             
                             <li>
-                                <a target="_blank" href="http://weibo.com/15820715665">
+                                <a target="_blank" href="http://weibo.com/wang-si-gong-zi">
                                     <span class="fa-stack fa-lg">
                                         <i class="fa fa-circle fa-stack-2x"></i>
                                         <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
@@ -306,7 +660,7 @@
                     <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
                     
                     <li>
-                        <a target="_blank" href="https://www.zhihu.com/people/276293337@qq.com">
+                        <a target="_blank" href="https://www.zhihu.com/people/wang-si-gong-zi">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa  fa-stack-1x fa-inverse">知</i>
@@ -316,7 +670,7 @@
                     
                     
                     <li>
-                        <a target="_blank" href="http://weibo.com/15820715665">
+                        <a target="_blank" href="http://weibo.com/wang-si-gong-zi">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>

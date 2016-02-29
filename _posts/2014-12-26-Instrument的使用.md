@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title: "Instrument & IOS & 性能优化"
@@ -7,7 +6,9 @@ date: 2014-12-26 10:42:42
 author: "Minato"
 header-img: "img/post-bg-2015.jpg"
 tags:
-- Instrument IOS 性能优化
+    - Instrument 
+    - IOS 
+    - 性能优化
 ---
 
 # Instrument的使用
