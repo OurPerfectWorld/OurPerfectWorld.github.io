@@ -4,3 +4,11 @@ node_modules
 */.DS_Store
 */*/.DS_Store
 *.sh
+
+_site/about/index.html
+
+_site/index.html
+
+_site/index.html
+
+_site/feed.xml
