@@ -1,9 +1,9 @@
 ---
-layout:     post
-title:      "DragonBone 3.0 & Flash"
-subtitle:   " \"DragonBone 3.0\""
-date:       2016-07-07 11:24:24
-author:     "Minato"
+layout: post
+title: "DragonBone 3.0 & Flash"
+subtitle: " \"DragonBone 3.0\""
+date: 2016-07-07 4:24:24
+author: "Minato"
 header-img: "img/post-bg-2015.jpg"
 tags:
     - Dragonbone
