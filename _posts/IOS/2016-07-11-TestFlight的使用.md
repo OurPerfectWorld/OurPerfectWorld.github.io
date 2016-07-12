@@ -37,6 +37,13 @@ tags:
     * 人员上限
         * 1000个邮箱账号
 
+* #### 可以参考使用的测试方式
+    1. 注册一个新的Apple账号，加入到开发账号组中，分配测试的职能
+    2. 将测试的账号加入到内部测试，并进行测试通知
+    3. 测试账号收到通知后第一次在**TestFlight**中，进行输入邮箱验证，就可以进行游戏下载测试
+    4. 之后其他app的设备只需要在**TestFlight**中登陆该账号即可下载游戏
+    5. 注意：使用**TestFlight**需要ios 8.1版本以上才能支持
+
 * #### 好处
     * 使用外部测试**无需提供设备ID**，提供邮箱按照指引即可下载App进行测试
 
@@ -53,9 +60,9 @@ tags:
     * ![][pic1]
 * 根据指引操作
     * 下载**TestFlight**的App
-    * 登陆Apple账号，输入**key**  
+    * 登陆Apple账号，第一次需要输入邮箱的验证码**key**，之后可以直接下载安装
 * 注意
-    * 一个账号只能下载一次
+    * 一个账号可以进行多次下载
 
 
 
@@ -87,7 +94,7 @@ tags:
 
 
 ## 参考
-* #### [官方描述][url3]搜索TestFLight
+* #### [TestFLight官方描述][url3]
 * #### [iOS 平台如何使用 TestFlight 进行 Beta 测试][url2]
 
 
@@ -105,7 +112,7 @@ tags:
 
 [url1]:https://itunesconnect.apple.com/
 [url2]:https://blog.coding.net/blog/ios-testFlight
-[url3]:https://developer.apple.com/
+[url3]:https://developer.apple.com/testflight/
 
 ---
 
