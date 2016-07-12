@@ -87,7 +87,7 @@ tags:
 
 
 ## 参考
-* #### [官方描述][url3]搜索TestFLight既有
+* #### [官方描述][url3]搜索TestFLight
 * #### [iOS 平台如何使用 TestFlight 进行 Beta 测试][url2]
 
 
