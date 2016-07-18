@@ -116,6 +116,10 @@ tags:
         * 使用的图片和元件中，图片的引用不能超过1（绿色图标的），不能出现图片有as连接的情况
         * 图片损坏和异常
         * ![][pic9]
+* #### 导出文件时错误3
+    * ![][pic10]
+    * 原因
+        * 帧事件的命名@gongji，没有加入@时出现的错误
 
 
 [url1]:http://dragonbones.effecthub.com/getting_started_cn.html
@@ -137,6 +141,7 @@ tags:
 [pic7]:../../../../img/post_db_flash/po7.png
 [pic8]:../../../../img/post_db_flash/po8.png
 [pic9]:../../../../img/post_db_flash/po9.png
+[pic10]:../../../../img/post_db_flash/po10.png
 
 
 ----
